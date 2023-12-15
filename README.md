@@ -1,7 +1,5 @@
 # Student Management System
 
-## Introduction
-
 The Student Management System is a comprehensive solution designed to streamline various processes for university students. This system facilitates functions such as registration, personal details amendments, student ID card issuance requests, withdrawal processes, and campus credit balance top-ups.
 
 ## User Interface
