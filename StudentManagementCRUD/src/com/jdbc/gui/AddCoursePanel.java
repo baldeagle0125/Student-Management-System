@@ -14,8 +14,6 @@ public class AddCoursePanel extends JPanel {
     private JComboBox<String> courseLevelCombo;
     private JComboBox<String> courseDeliveryCombo;
     private JComboBox<String> courseDurationCombo;
-    private final JButton addButton;
-    private final JButton cancelButton;
 
     public AddCoursePanel(DatabaseService databaseService) {
 
@@ -45,7 +43,7 @@ public class AddCoursePanel extends JPanel {
         
         // Label and text field font settings
         Font labelFont = new Font("Helvetica", Font.BOLD, 18); // Larger font
-        Dimension textFieldSize = new Dimension(500, 30); // Wide text fields
+        Dimension textFieldSize = new Dimension(330, 30); // Wide text fields
         
         // Define the text fields
         courseNameField = new JTextField();
@@ -54,9 +52,8 @@ public class AddCoursePanel extends JPanel {
         courseCategoryField.setPreferredSize(textFieldSize);
         
         // Define a common preferred size for wider combo boxes
-        Dimension comboBoxSize = new Dimension(250, 30); // Width, Height in pixels
-        
-
+        Dimension comboBoxSize = new Dimension(100, 30); // Width, Height in pixels
+       
         // Course Name
         gbc.gridx = 0; 
         gbc.gridy = 0; 
@@ -96,7 +93,6 @@ public class AddCoursePanel extends JPanel {
         courseLevelCombo.setPreferredSize(comboBoxSize);
         gbc.gridx = 1; 
         formPanel.add(courseLevelCombo, gbc);
-        //courseDetailsPanel.add(courseLevelCombo, gbc);
 
         // Course Delivery
         gbc.gridx = 0;
@@ -108,126 +104,135 @@ public class AddCoursePanel extends JPanel {
         courseDeliveryCombo.setPreferredSize(comboBoxSize);
         gbc.gridx = 1;
         formPanel.add(courseDeliveryCombo, gbc);
-        
 
         // Course Duration
         gbc.gridx = 0;
         gbc.gridy = 5;
+        
         JLabel courseDurationLabel = new JLabel("Course Duration:");
         courseDurationLabel.setFont(labelFont);
         formPanel.add(courseDurationLabel, gbc);
-        courseDurationCombo = new JComboBox<>(new String[]{"3 Years", "4 Years"});
+
+        courseDurationCombo = new JComboBox<>(new String[]{"3 Years", "4 Years"}); // Fixed by adding 'new'
         courseDurationCombo.setPreferredSize(comboBoxSize);
+
         gbc.gridx = 1;
         formPanel.add(courseDurationCombo, gbc);
 
         // Add and Cancel Buttons
-        addButton = new JButton("Add Course");
-        cancelButton = new JButton("Cancel");
+        // Correct syntax for creating JButton instances
+        JButton addButton = new JButton("Add Course"); // Instantiate with "new"
+        JButton cancelButton = new JButton("Cancel"); // Same here
 
-        // Panel for buttons with spacing
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0)); // 20px spacing
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(addButton);
+        // Panel for buttons with appropriate spacing
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0)); // Correct JPanel instantiation
 
-        gbc.gridx = 1;
-        gbc.gridy = 6;
-        gbc.gridwidth = 2;
-        formPanel.add(buttonPanel, gbc);
+        // Add buttons to the button panel
+        buttonPanel.add(cancelButton); // Add the "Cancel" button to the panel
+        buttonPanel.add(addButton); // Add the "Add Course" button to the panel
 
-        add(formPanel, BorderLayout.CENTER);
+        // GridBagConstraints to position the button panel
+        gbc.gridx = 1; // Correct grid position
+        gbc.gridy = 6; // Correct grid position
+        gbc.gridwidth = 2; // Span across two columns
+        gbc.anchor = GridBagConstraints.EAST; // Align to the right
+
+        // Add the button panel to the form panel
+        formPanel.add(buttonPanel, gbc); // Place it in the form panel
+
+        // Add the form panel to the layout
+        add(formPanel, BorderLayout.CENTER); // Correct placement in the BorderLayout
 
         // Add action listener for the "Add Course" button
-        addButton.addActionListener(e -> addCourse(databaseService, courseNameField, courseCategoryField));
+        addButton.addActionListener(e -> {
+            try {
+                // Prompt for confirmation before adding the course
+                int confirmation = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to add this course?",
+                    "Confirm Addition",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+                );
+
+                if (confirmation == JOptionPane.YES_OPTION) { // Proceed if the user confirms
+                    Course course = new Course(
+                        courseNameField.getText(),
+                        courseCategoryField.getText(),
+                        (int) courseCreditsSpinner.getValue(),
+                        (String) courseLevelCombo.getSelectedItem(),
+                        (String) courseDeliveryCombo.getSelectedItem(),
+                        (String) courseDurationCombo.getSelectedItem()
+                    );
+
+                    databaseService.insertCourse(course); // Insert into the database
+
+                    // Feedback on success
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Course added successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+
+                    // Clear fields after adding
+                    clearFields(courseNameField, courseCategoryField); 
+                    courseCreditsSpinner.setValue(30); 
+                    courseLevelCombo.setSelectedIndex(0); 
+                    courseDeliveryCombo.setSelectedIndex(0); 
+                    courseDurationCombo.setSelectedIndex(0); 
+
+                } else {
+                    // Optionally provide feedback if the user cancels
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Course addition canceled.",
+                        "Canceled",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                }
+
+            } catch (SQLException ex) {
+                // Handle database-related errors
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Database error: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+
+            } catch (NumberFormatException nfe) {
+                // Handle number format errors (e.g., invalid course credits)
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Invalid input. Please ensure all fields are correct.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            } catch (Exception exc) {
+                // Handle other unexpected errors
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Unexpected error: " + exc.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
 
         // Add "Cancel" listener to clear all fields
-        cancelButton.addActionListener(e -> clearFields(courseNameField, courseCategoryField));
-
-        // Add keyboard action for Enter key
-        KeyAdapter enterKeyListener = new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    if (e.getSource() == cancelButton) {
-                        clearFields(courseNameField, courseCategoryField);
-                    } else {
-                        addCourse(databaseService, courseNameField, courseCategoryField);
-                    }
-                }
-            }
-        };
-        addButton.addKeyListener(enterKeyListener); // Add listener to the "Add Course" button
-        cancelButton.addKeyListener(enterKeyListener); // Add listener to the "Cancel" button
+        cancelButton.addActionListener(e -> {
+            clearFields(courseNameField, courseCategoryField); 
+            courseCreditsSpinner.setValue(30); 
+            courseLevelCombo.setSelectedIndex(0); 
+            courseDeliveryCombo.setSelectedIndex(0); 
+            courseDurationCombo.setSelectedIndex(0); 
+        });
     }
 
     private void clearFields(JTextField... fields) {
         for (JTextField field : fields) {
             field.setText("");
-        }
-    }
-
-    private void addCourse(DatabaseService databaseService, JTextField... fields) {
-        try {
-            int confirmation = JOptionPane.showConfirmDialog(
-                this,
-                "Are you sure you want to add this course?",
-                "Confirm Addition",
-                JOptionPane.YES_NO_OPTION
-            );
-
-            if (confirmation == JOptionPane.YES_OPTION) {
-                // Ensure you have all required field values
-                Course course = new Course(
-                    fields[0].getText(), // Course Name
-                    fields[1].getText(), // Course Category
-                    Integer.parseInt(fields[2].getText()), // Course Credits (assuming conversion to int)
-                    fields[3].getText(), // Course Level
-                    fields[4].getText(), // Course Delivery
-                    fields[5].getText()  // Course Duration
-                    // Add other necessary fields
-                );
-
-                // Insert into the database
-                databaseService.insertCourse(course);
-
-                // Success feedback
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Course added successfully!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-
-                // Clear the input fields after successful addition
-                clearFields(fields);
-
-            } else {
-                // Cancellation feedback
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Course addition canceled.",
-                    "Canceled",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-            }
-
-        } catch (NumberFormatException nfe) {
-            // Handle number format errors (e.g., invalid credits)
-            JOptionPane.showMessageDialog(
-                this,
-                "Invalid input for credits. Please enter a valid number.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
-
-        } catch (SQLException ex) {
-            // Handle database errors
-            JOptionPane.showMessageDialog(
-                this,
-                "Database error: " + ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
         }
     }
 }

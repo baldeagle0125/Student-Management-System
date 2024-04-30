@@ -9,7 +9,12 @@ import com.jdbc.service.DatabaseService;
 import java.sql.SQLException;
 
 public class ViewCoursePanel extends JPanel {
+    private DefaultTableModel tableModel; // Hold reference to the table model
+    private JTable courseTable; // Hold reference to the JTable
+    private DatabaseService databaseService;
+
     public ViewCoursePanel(DatabaseService databaseService) {
+        this.databaseService = databaseService; // Store the service reference
         setLayout(new BorderLayout());
 
         // Title section
@@ -25,8 +30,8 @@ public class ViewCoursePanel extends JPanel {
 
         // Table setup
         String[] columnNames = {"Code", "Name", "Category", "Credits", "Level", "Delivery", "Duration"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-        JTable courseTable = new JTable(tableModel);
+        tableModel = new DefaultTableModel(columnNames, 0);
+        courseTable = new JTable(tableModel);
 
         // Set custom font and style for the table header
         JTableHeader tableHeader = courseTable.getTableHeader();
@@ -56,24 +61,27 @@ public class ViewCoursePanel extends JPanel {
 
         courseTable.setDefaultRenderer(Object.class, customRenderer); // Apply custom renderer
         
-        // Set the preferred, minimum, and maximum width for the first column
-        TableColumn codeColumn = courseTable.getColumnModel().getColumn(0);
-        codeColumn.setPreferredWidth(50); // Preferred width for "Code"
-        codeColumn.setMinWidth(30); // Minimum width
-        codeColumn.setMaxWidth(70); // Maximum width
-
-        // Adjust the "Name" column
-        TableColumn nameColumn = courseTable.getColumnModel().getColumn(1);
-        nameColumn.setPreferredWidth(240); // Preferred width for "Name"
-        nameColumn.setMinWidth(200); // Minimum width
-        nameColumn.setMaxWidth(270); // Maximum width
-        
         JScrollPane scrollPane = new JScrollPane(courseTable); // Enable scrolling
         add(scrollPane, BorderLayout.CENTER); // Add to the center
+
+        // Refresh button setup
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Center the button
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(25, 0, 25, 0)); // 25px bottom padding
+        JButton refreshButton = new JButton("Refresh Page"); // Create a Refresh button
+        refreshButton.addActionListener(e -> refreshTable()); // Refresh the table on click
+        buttonPanel.add(refreshButton); // Add the Refresh button to the panel
         
+        add(buttonPanel, BorderLayout.SOUTH); // Add the button panel to the south section
+
         // Fetch data and populate the table
+        refreshTable(); // Load course data on initialization
+    }
+
+    // Method to refresh the course table data
+    private void refreshTable() {
         try {
-            List<Course> courses = databaseService.getAllCourse();
+            tableModel.setRowCount(0); // Clear existing rows
+            List<Course> courses = databaseService.getAllCourse(); // Fetch all courses
             for (Course course : courses) {
                 Object[] row = {
                     course.getCourseId(),

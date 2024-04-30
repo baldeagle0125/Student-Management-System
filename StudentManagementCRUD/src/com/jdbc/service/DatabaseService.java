@@ -98,6 +98,25 @@ public class DatabaseService {
 
         return studentIds; // Return the list of student IDs
     }
+    
+    public List<String> getAllCourseIds() throws SQLException {
+    List<String> courseIds = new ArrayList<>(); // Create a list to store course IDs
+
+    // Use a try-with-resources block to ensure resources are properly managed
+    try (Connection connection = databaseUtil.getConnection(); 
+         Statement statement = connection.createStatement();
+         ResultSet resultSet = statement.executeQuery(QueryUtil.selectAllCourseIDsQuery())) { // Query to fetch all course IDs
+
+        // Loop through the result set and add each course ID to the list
+        while (resultSet.next()) {
+            String courseId = resultSet.getString("course_id"); // Fetch the course ID from the result set
+            courseIds.add(courseId); // Add it to the list
+        }
+    }
+
+    return courseIds; // Return the list of course IDs
+}
+
 
     
     
@@ -182,17 +201,36 @@ public class DatabaseService {
         return students; // Return the list of students
     } // End getAllStudent
     
-    // Utility method to print student information
-    private void printStudent(Student student) {
-        System.out.println("Student Id: " + student.getStudentId());
-        System.out.println("Student Name: " + student.getStudentName());
-        System.out.println("Student Email: " + student.getStudentEmail());
-        System.out.println("Student Phone: " + student.getStudentPhone());
-        System.out.println("Student Date of Birth: " + student.getStudentDOB());
-        System.out.println("Student Address: " + student.getStudentAddress());
-        System.out.println("Student Balance: " + student.getStudentBalance());
-        System.out.println("-------------------------------------------------");
+    // Method to get a course by its ID
+    public Course getCourseById(int courseId) throws SQLException {
+        Course course = null; // Initialize the Course object
+
+        // Define the query with a parameter placeholder
+        String query = QueryUtil.selectCourseById(); 
+
+        try (Connection connection = databaseUtil.getConnection(); 
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, courseId); // Set the parameter index for course ID
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) { // If a record is found
+                    course = new Course(
+                        resultSet.getInt("course_id"),
+                        resultSet.getString("course_name"),
+                        resultSet.getString("course_category"),
+                        resultSet.getInt("course_credits"),
+                        resultSet.getString("course_level"),
+                        resultSet.getString("course_delivery"),
+                        resultSet.getString("course_duration")
+                    );
+                }
+            }
+        }
+
+        return course; // Return the Course object or null if not found
     }
+
     
     // Method to get a student by their ID
     public Student getStudentById(int studentId) throws SQLException {
@@ -239,6 +277,27 @@ public class DatabaseService {
             }
         }
     } // End deleteStudentById
+    
+    // Method to delete a Course by their ID
+   public void deleteCourseById(int courseId) throws SQLException {
+        try (Connection connection = databaseUtil.getConnection();
+             PreparedStatement statement = connection.prepareStatement(QueryUtil.deleteCourseById())) {
+
+            // Set the course ID in the delete query
+            statement.setInt(1, courseId);
+
+            // Execute the delete query and get the number of affected rows
+            int rows = statement.executeUpdate();
+
+            // Check if the delete was successful
+            if (rows > 0) {
+                System.out.println("Course deleted successfully.");
+            } else {
+                System.out.println("Something went wrong...");
+            }
+        }
+    }
+
     
     // Method to update a student record in the database
     public void updateStudent(Student student) throws SQLException {
@@ -295,6 +354,10 @@ public class DatabaseService {
             }
         }
     } // End validateStaffCredentials
+
+    
+
+    
 
     
 }

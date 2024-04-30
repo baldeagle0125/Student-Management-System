@@ -15,6 +15,10 @@ public class QueryUtil {
         return "SELECT * FROM STUDENT_INFO";
     }
     
+    public static String selectAllCourseQuery() {
+    return "SELECT * FROM COURSE_INFO"; // Query to select all courses
+    }
+
     public static String selectStudentById() {
         return "SELECT * FROM STUDENT_INFO WHERE student_id = ?"; // Placeholder for parameter
     }
@@ -35,12 +39,7 @@ public class QueryUtil {
                 + "course_level, course_delivery, course_duration) " +
                "VALUES (?,?,?,?,?,?)"; // Prepared statement with placeholders
     }
-    
-    // SQL query to insert a new course record into the COURSE_INFO table
-    public static String selectAllCourseQuery(){
-        return "SELECT * FROM COURSE_INFO";
-    }
-    
+  
     // SQL query to UPDATE a course record into the COURSE_INFO table
     public static String updateCourseQuery(int courseId) {
         return "UPDATE COURSE_INFO SET course_name = ?, course_category = ?, "
@@ -52,6 +51,20 @@ public class QueryUtil {
     public static String selectAllStudentIDsQuery(){
         return "SELECT student_id FROM student_info";
     }
+    
+    // SQL query to display all course IDs for a given page or context
+    public static String selectAllCourseIDsQuery() {
+        return "SELECT course_id FROM COURSE_INFO"; // Query to fetch all course IDs
+    }
 
     
+    public static String deleteCourseById() {
+        return "DELETE FROM COURSE_INFO WHERE course_id = ?"; // Placeholder for parameter
+    }
+
+    
+    public static String selectCourseById() {
+        return "SELECT * FROM COURSE_INFO WHERE course_id = ?"; // Query with a placeholder
+    } 
+
 }// End QueryUtil

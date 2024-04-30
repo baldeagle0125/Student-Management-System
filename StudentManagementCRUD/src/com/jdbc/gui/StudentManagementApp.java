@@ -48,7 +48,7 @@ public class StudentManagementApp extends JFrame {
         topTitlePanel.setBackground(new Color(92,132,161)); // Snowy mountain Color
         
         // Include the logged-in user's name in the label
-        String topTitleText = "Logged in: " + loggedInUserName; 
+        String topTitleText = "Staff Logged in " + loggedInUserName; 
         JLabel topTitleLabel = new JLabel(topTitleText, SwingConstants.LEFT);
         topTitleLabel.setFont(new Font("Arial", Font.BOLD, 12));
         topTitlePanel.add(topTitleLabel, BorderLayout.CENTER); // Add the label to the top panel
@@ -85,7 +85,7 @@ public class StudentManagementApp extends JFrame {
         addTabWithCustomMargin(tabbedPane, "Display", new ViewCoursePanel(databaseService), tabFont);
         addTabWithCustomMargin(tabbedPane, "Add New", new AddCoursePanel(databaseService), tabFont);
         addTabWithCustomMargin(tabbedPane, "Update", new UpdateCoursePanel(databaseService), tabFont);
-        addTabWithCustomMargin(tabbedPane, "Remove", new DeleteStudentPanel(databaseService), tabFont);
+        addTabWithCustomMargin(tabbedPane, "Remove", new DeleteCoursePanel(databaseService), tabFont);
         
         // Create and Disable Tab just to use as separator
         JPanel emptyPanel2 = new JPanel(); // An empty panel for a placeholder tab
