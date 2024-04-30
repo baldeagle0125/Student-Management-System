@@ -4,6 +4,7 @@ package com.jdbc.util;
  */
 public class QueryUtil {
     
+<<<<<<< HEAD
     // SQL query to insert a new Student record into the STUDENT_INFO table   
     public static String insertStudentQuery(){
         return "INSERT INTO student_info (student_name, student_email, student_phone, "
@@ -67,4 +68,26 @@ public class QueryUtil {
         return "SELECT * FROM COURSE_INFO WHERE course_id = ?"; // Query with a placeholder
     } 
 
+=======
+    public static String insertStudentQuery(){
+        return "INSERT INTO STUDENT_INFO (student_name, student_address, student_balance) VALUES (?,?,?)";
+    }
+    
+    public static String selectAllStudentQuery(){
+        return "SELECT * FROM STUDENT_INFO";
+    }
+    
+    public static String selectStudentById(int studentId){
+        return "SELECT * FROM STUDENT_INFO WHERE student_id = " +studentId;
+    }
+    
+    public static String deleteStudentById(int studentId){
+        return "DELETE FROM STUDENT_INFO WHERE student_id = "+studentId;
+    }
+    
+    public static String updateStudentQuery(int studentId){
+        return "UPDATE STUDENT_INFO SET student_name = ?, student_address = ?, student_balance = ? WHERE student_id = "+studentId;
+    }
+    
+>>>>>>> origin/main
 }// End QueryUtil

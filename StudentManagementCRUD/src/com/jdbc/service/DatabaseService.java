@@ -1,5 +1,6 @@
 package com.jdbc.service;
 
+<<<<<<< HEAD
 // Import relevant classes for JDBC database operations
 import com.jdbc.model.Course;
 import com.jdbc.model.Student; // The Student class to represent student data
@@ -361,3 +362,134 @@ public class DatabaseService {
 
     
 }
+=======
+// Internal Imports
+import com.jdbc.model.Student;
+import com.jdbc.util.DatabaseUtil;
+import com.jdbc.util.QueryUtil;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.ResultSet;
+
+/**
+ * This class is responsible for interacting with the database to perform operations
+ * related to students.
+ * This class includes a method to insert a new student into the database.
+ */
+
+public class DatabaseService {
+    
+    // Create an instance of the DatabaseUtil class to handle database connection
+    DatabaseUtil databaseUtil = new DatabaseUtil();
+    
+    // Inserts a new student record into the database
+    // throws SQLException If a database access error occurs
+    public void insertStudent(Student student) throws SQLException {
+        
+        // Try-with-resources block ensures the connection is closed after use
+        try (Connection connection = databaseUtil.getConnection();
+            
+            // Prepare a SQL statement for inserting a new student using a predefined query
+            PreparedStatement preparedStatement = connection.prepareStatement(QueryUtil.insertStudentQuery());){
+            
+            // Set values for the prepared statement using data from the Student object
+            preparedStatement.setString(1, student.getStudentName());
+            preparedStatement.setString(2, student.getStudentAddress());
+            preparedStatement.setDouble(3, student.getStudentBalance());
+            
+            // Execute the SQL update statement and get the number of affected rows
+            int rows = preparedStatement.executeUpdate();
+            
+            // Check if the insertion was successful and print appropriate message
+            if(rows > 0){
+                System.out.println("Record created successfully.");
+            } else {
+                System.out.println("Insert record FAILED...");
+            }
+            
+        }// End try
+    }// End insertStudent()
+    
+    public void getAllStudent()throws SQLException {
+        
+        try(Connection connection = databaseUtil.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(QueryUtil.selectAllStudentQuery());) { 
+                
+            while(resultSet.next()){
+                printStudent(new Student(resultSet.getInt("student_Id"),
+                        resultSet.getString("student_name"),
+                        resultSet.getString("student_address"),
+                        resultSet.getDouble("student_balance")
+                ));
+            }
+        }
+    }// End getAllStudents()
+    
+    private void printStudent(Student student){
+        System.out.println("Student Id: "+student.getStudentId());
+        System.out.println("Student Name: "+student.getStudentName());
+        System.out.println("Student Address: "+student.getStudentAddress());
+        System.out.println("Student Balance: "+student.getStudentBalance());
+        System.out.println("-------------------------------------------------");
+    }
+    
+    public boolean getStudentById(int id) throws SQLException {
+        
+        boolean isFound = false;
+        
+        try(Connection connection = databaseUtil.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(QueryUtil.selectStudentById(id));
+                ){
+            
+            if(resultSet.next()){
+                isFound = true;
+                printStudent(new Student(resultSet.getInt("Student_id"), resultSet.getString("student_name"),
+                        resultSet.getString("student_address"), resultSet.getDouble("student_balance")));
+            } else {
+                System.out.println("Record not found for Id: "+id);
+            }
+        }
+        return isFound;
+    }// End getStudentById()
+    
+    public void deleteStudentById(int studentId) throws SQLException{
+        
+        try(Connection connection = databaseUtil.getConnection();
+                Statement statement = connection.createStatement(); ){
+            int rows = statement.executeUpdate(QueryUtil.deleteStudentById(studentId));
+            
+            if(rows > 0){
+                System.out.println("Record deleted successfully.");
+            } else {
+                System.out.println("Something went wrong.. ");
+            }
+        }
+    }// deleteStudentById()
+    
+    public void updateStudent(Student student) throws SQLException {
+        
+        try(Connection connection = databaseUtil.getConnection();
+                PreparedStatement preparedStatement = connection.
+                        prepareStatement(QueryUtil.updateStudentQuery(student.getStudentId()))){
+            
+            preparedStatement.setString(1, student.getStudentName());
+            preparedStatement.setString(2, student.getStudentAddress());
+            preparedStatement.setDouble(3, student.getStudentBalance());
+            
+            int rows = preparedStatement.executeUpdate();
+            if(rows > 0){
+                System.out.println("Record updated successfuly.");
+            } else {
+                System.out.println("Update record Failed.");
+            }
+        } 
+    }// End updateStudent()
+    
+}// End Class
+
+>>>>>>> origin/main

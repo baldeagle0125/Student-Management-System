@@ -2,98 +2,69 @@ package com.jdbc.main;
 
 import com.jdbc.model.Student;
 import com.jdbc.service.DatabaseService;
-import java.sql.SQLException;
 import java.util.Scanner;
 
 /**
- * Command-line interface for managing student data
+ * @author mazds
  */
 public class MainClass {
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         
-        DatabaseService databaseService = new DatabaseService(); // Interface for database operations
-        Scanner scanner = new Scanner(System.in); // To read input from the console
+        DatabaseService databaseService = new DatabaseService();
+        try(Scanner scanner = new Scanner(System.in);){
+            
+            boolean isRunning = true;
+            
+            while(isRunning){
+                System.out.println("Enter choice");
+                System.out.println("1. Insert a student");
+                System.out.println("2. Select all");
+                System.out.println("3. Select Student by Id");
+                System.out.println("4. Delete Student");
+                System.out.println("5. Update Student");
+                System.out.println("6. Exit");
 
-        boolean isRunning = true; // To control the while loop
-        
-        while (isRunning) {
-            System.out.println("Choose an option:");
-            System.out.println("1. Add Student");
-            System.out.println("2. Display All Students");
-            System.out.println("3. Find Student by ID");
-            System.out.println("4. Delete Student by ID");
-            System.out.println("5. Update Student");
-            System.out.println("6. Exit");
+                int choice = Integer.parseInt(scanner.nextLine());
 
-            int choice = Integer.parseInt(scanner.nextLine()); // User choice
-
-            switch (choice) {
-                case 1:
-                    System.out.println("Enter student details (Name, Email, Phone, Date of Birth (yyyy-MM-dd), Address, Balance):");
-                    String name = scanner.nextLine();
-                    String email = scanner.nextLine();
-                    String phone = scanner.nextLine();
-                    String dob = scanner.nextLine();
-                    String address = scanner.nextLine();
-                    double balance = Double.parseDouble(scanner.nextLine());
-                    
-                    Student newStudent = new Student(name, email, phone, dob, address, balance);
-                    databaseService.insertStudent(newStudent);
-                    System.out.println("Student added successfully.");
-                    break;
-                    
-                case 2:
-                    System.out.println("Displaying all students:");
-                    databaseService.getAllStudent().forEach(student -> {
-                        System.out.println(student.toString()); 
-                    });
-                    break;
-                    
-                case 3:
-                    System.out.println("Enter student ID:");
-                    int studentId = Integer.parseInt(scanner.nextLine());
-                    if (!databaseService.getStudentById(studentId)) {
-                        System.out.println("Student not found with ID: " + studentId);
-                    }
-                    break;
-
-                case 4:
-                    System.out.println("Enter student ID to delete:");
-                    int deleteId = Integer.parseInt(scanner.nextLine());
-                    databaseService.deleteStudentById(deleteId);
-                    System.out.println("Student deleted successfully.");
-                    break;
-
-                case 5:
-                    System.out.println("Enter student ID to update:");
-                    int updateId = Integer.parseInt(scanner.nextLine());
-                    if (databaseService.getStudentById(updateId)) {
-                        System.out.println("Enter new details (Name, Email, Phone, DOB, Address, Balance):");
-                        String newName = scanner.nextLine();
-                        String newEmail = scanner.nextLine();
-                        String newPhone = scanner.nextLine();
-                        String newDOB = scanner.nextLine();
-                        String newAddress = scanner.nextLine();
-                        double newBalance = Double.parseDouble(scanner.nextLine());
+                switch (choice){
+                    case 1:
+                        System.out.println("Enter Name, Address, and Balance.");
+                        databaseService.insertStudent(new Student(scanner.nextLine(), scanner.nextLine(), Double.parseDouble(scanner.nextLine())));
+                        break;
+                    case 2:
+                        databaseService.getAllStudent();
+                        break;
+                    case 3:
+                        System.out.println("Enter Student Id:");
+                        databaseService.getStudentById(Integer.parseInt(scanner.nextLine()));
+                        break;
+                    case 4:
+                        System.out.println("Enter Student Id:");
+                        databaseService.deleteStudentById(Integer.parseInt(scanner.nextLine()));
+                        break;
+                    case 5:
+                        System.out.println("Enter Student Id:");
+                        int updateId = Integer.parseInt(scanner.nextLine());
+                        boolean isFound = databaseService.getStudentById(updateId);
                         
-                        Student updatedStudent = new Student(updateId, newName, newEmail, newPhone, newDOB, newAddress, newBalance);
-                        databaseService.updateStudent(updatedStudent);
-                        System.out.println("Student updated successfully.");
-                    } else {
-                        System.out.println("Student not found with ID: " + updateId);
-                    }
-                    break;
-
-                case 6:
-                    System.out.println("Exiting the application. Goodbye!");
-                    isRunning = false;
-                    break;
-                    
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-                    break;
-            } // End switch
-        } // End while
-    } // End main
-} // End MainClass
+                        if (isFound){
+                            System.out.println("Enter new name, address, balance");
+                            Student student = new Student(updateId, scanner.nextLine(), 
+                                    scanner.nextLine(), Double.parseDouble(scanner.nextLine()));
+                            databaseService.updateStudent(student);
+                        }
+                        break;
+                    case 6:
+                        System.out.println("Goodbye!");
+                        isRunning = false;
+                        break;
+                    default:
+                        break;
+                }// End switch
+            }// End while
+        } catch (Exception e) {
+            throw new RuntimeException("Something went WRONG: " +e);
+        }
+    }// End main
+}// End main
