@@ -19,7 +19,7 @@ public class StudentManagementApp extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-
+        
         // Create the login panel
         LoginPanel loginPanel = new LoginPanel(databaseService);
 
@@ -40,50 +40,87 @@ public class StudentManagementApp extends JFrame {
     }
 
     private JPanel createStudentManagementPanel(String loggedInUserName) {
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        mainPanel.setBackground(new Color(222, 222, 222)); // Light gray
-
+        
         // Top Header
         JPanel topTitlePanel = new JPanel(new BorderLayout());
-        topTitlePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        topTitlePanel.setBackground(new Color(92, 132, 161)); // Snowy mountain Color
-
+        topTitlePanel.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 0)); 
+        //topTitlePanel.setBackground(new Color (73, 89, 105));
+        topTitlePanel.setBackground(new Color(92,132,161)); // Snowy mountain Color
+        
         // Include the logged-in user's name in the label
-        String topTitleText = "Logged in: " + loggedInUserName;
+        String topTitleText = "Logged in: " + loggedInUserName; 
         JLabel topTitleLabel = new JLabel(topTitleText, SwingConstants.LEFT);
         topTitleLabel.setFont(new Font("Arial", Font.BOLD, 12));
         topTitlePanel.add(topTitleLabel, BorderLayout.CENTER); // Add the label to the top panel
 
-        mainPanel.add(topTitlePanel, BorderLayout.NORTH); // Add topTitlePanel to the top
+        add(topTitlePanel, BorderLayout.NORTH); // Add topTitlePanel to the top
+                
+        // Blue color for selected tabs 
+        UIManager.put("TabbedPane.selected", new Color(173, 216, 230)); 
 
-        // Create a tabbed pane for menu items
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-        tabbedPane.setBackground(new Color(239, 239, 239)); // Light gray background
-        tabbedPane.setFont(new Font("Arial", Font.BOLD, 14)); // Tab font
+        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT); // Position the tabs on the left
+
+        // Set the desired font for tab labels
+        Font tabFont = new Font("Helvetica", Font.BOLD, 14); // Bold font for tab titles
 
         // GROUP 1: Student-related tabs
-        addTab(tabbedPane, "STUDENTS", null); // Title tab
-        addTab(tabbedPane, "Display", new ViewStudentPanel(databaseService));
-        addTab(tabbedPane, "Add New", new AddStudentPanel(databaseService));
-        addTab(tabbedPane, "Update", new UpdateStudentPanel(databaseService));
-        addTab(tabbedPane, "Remove", new DeleteStudentPanel(databaseService));
-
+        addCenteredTab(tabbedPane, "STUDENTS", new JPanel(), tabFont); // Centered, light gray
+        tabbedPane.setEnabledAt(0, false); // Disable the Student Menu tab to prevent interaction
+        
+        // Left-aligned
+        addTabWithCustomMargin(tabbedPane, "Display", new ViewStudentPanel(databaseService), tabFont);
+        addTabWithCustomMargin(tabbedPane, "Add New", new AddStudentPanel(databaseService), tabFont); 
+        addTabWithCustomMargin(tabbedPane, "Update", new UpdateStudentPanel(databaseService), tabFont);
+        addTabWithCustomMargin(tabbedPane, "Remove", new DeleteStudentPanel(databaseService), tabFont);
+        
+        // Create and Disable Tab just to use as separator
+        JPanel emptyPanel = new JPanel(); // An empty panel for a placeholder tab
+        addTabWithCustomMargin(tabbedPane, "", emptyPanel, tabFont); // Creates a tab with empty content
+        tabbedPane.setEnabledAt(5, false); // Disable the Course Menu tab
+        
         // GROUP 2: Course-related tabs
-        addTab(tabbedPane, "COURSES", null); // Title tab
-        addTab(tabbedPane, "Display", new ViewCoursePanel(databaseService));
-        addTab(tabbedPane, "Add New", new AddCoursePanel(databaseService));
-        addTab(tabbedPane, "Update", new UpdateCoursePanel(databaseService));
-
+        addCenteredTab(tabbedPane, "COURSES", new JPanel(), tabFont); // Centered, light gray
+        tabbedPane.setEnabledAt(6, false); // Disable the Course Menu tab
+        
+        addTabWithCustomMargin(tabbedPane, "Display", new ViewCoursePanel(databaseService), tabFont);
+        addTabWithCustomMargin(tabbedPane, "Add New", new AddCoursePanel(databaseService), tabFont);
+        addTabWithCustomMargin(tabbedPane, "Update", new UpdateCoursePanel(databaseService), tabFont);
+        addTabWithCustomMargin(tabbedPane, "Remove", new DeleteStudentPanel(databaseService), tabFont);
+        
+        // Create and Disable Tab just to use as separator
+        JPanel emptyPanel2 = new JPanel(); // An empty panel for a placeholder tab
+        addTabWithCustomMargin(tabbedPane, "", emptyPanel2, tabFont); // Creates a tab with empty content
+        tabbedPane.setEnabledAt(11, false); // Disable the Course Menu tab
+        
+        // GROUP 3: Enrolled-related tabs
+        addCenteredTab(tabbedPane, "ENROLLMENTS", new JPanel(), tabFont); // Centered, light gray
+        tabbedPane.setEnabledAt(12, false); // Disable the Course Menu tab
+        addTabWithCustomMargin(tabbedPane, "By Courses", new ViewCoursePanel(databaseService), tabFont);
+        // Create and Disable Tab just to use as separator
+        JPanel emptyPanel3 = new JPanel(); // An empty panel for a placeholder tab
+        addTabWithCustomMargin(tabbedPane, "", emptyPanel3, tabFont); // Creates a tab with empty content
+        tabbedPane.setEnabledAt(14, false); // Disable the Course Menu tab
+        
         // GROUP 4: ACCOUNT-related tabs
-        addTab(tabbedPane, "ACCOUNT", null); // Title tab
-        addTab(tabbedPane, "Logout", null); // Logout tab
-
+        addCenteredTab(tabbedPane, "ACCOUNT", new JPanel(), tabFont); // Centered, light gray
+        tabbedPane.setEnabledAt(15, false); // Disable the Course Menu tab
+        
+        // Tab for "Logout"
+        JPanel logoutPanel = new JPanel(); // Empty panel for "Logout"
+        addTabWithCustomMargin(tabbedPane, "Logout", logoutPanel, new Font("Arial", Font.BOLD, 14));
+        // Create and Disable Tab just to use as separator
+        JPanel emptyPanel4 = new JPanel(); // An empty panel for a placeholder tab
+        addTabWithCustomMargin(tabbedPane, "", emptyPanel4, tabFont); // Creates a tab with empty content
+        tabbedPane.setEnabledAt(17, false); // Disable the Course Menu tab
+        
+        // Set the default selected tab to "View Students"
+        tabbedPane.setSelectedIndex(1); // Default index
+        
         // Attach a change listener to detect when the "Logout" tab is selected
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (tabbedPane.getSelectedIndex() == tabbedPane.getTabCount() - 1) {
+                if (tabbedPane.getSelectedComponent() == logoutPanel) {
                     // Ask for confirmation before logging out
                     int confirmation = JOptionPane.showConfirmDialog(
                         StudentManagementApp.this,
@@ -93,21 +130,61 @@ public class StudentManagementApp extends JFrame {
                     );
 
                     if (confirmation == JOptionPane.YES_OPTION) {
-                        dispose(); // Close the frame (ends the session)
+                        // Logic to handle logout
+                        //dispose(); // Close the frame (ends the session)
+                        new StudentManagementApp(); // Redirect to login page
                     } else {
                         // If user clicks "No", switch back to another tab
-                        tabbedPane.setSelectedIndex(0); // Back to index "STUDENTS"
+                        tabbedPane.setSelectedIndex(1); // Back to index "View Students"
                     }
                 }
             }
         });
 
-        mainPanel.add(tabbedPane, BorderLayout.CENTER); // Add tabbed pane to the center
+        setVisible(true); // Make the frame visible
+    
+        // Create a main panel to hold the tabbedPane
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder()); // Ensure no border
+        mainPanel.add(tabbedPane, BorderLayout.CENTER); // Add tabbedPane to the center to take full space
+         mainPanel.setBackground(new Color(222, 222, 222)); // Light gray
         return mainPanel;
+        
+        
     }
 
-    private void addTab(JTabbedPane tabbedPane, String title, JPanel content) {
-        tabbedPane.addTab(title, content);
+    // Method to add a tab with custom margin and left alignment
+    private void addTabWithCustomMargin(JTabbedPane tabbedPane, String title, JPanel content, Font tabFont) {
+        int tabWidth = 220; // Custom tab width
+        JPanel tabPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)); // Left-aligned
+        tabPanel.setPreferredSize(new Dimension(tabWidth, 30)); 
+        tabPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // 10px margin
+        tabPanel.setBackground(new Color(255, 255, 255)); // Tab white background
+
+        JLabel tabLabel = new JLabel(title); 
+        tabLabel.setFont(tabFont); 
+        tabLabel.setHorizontalAlignment(SwingConstants.LEFT); 
+        
+        tabPanel.add(tabLabel); 
+        tabbedPane.addTab("", content); 
+        tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, tabPanel); 
+    }
+
+    // Method to add a centered tab with light gray background
+    private void addCenteredTab(JTabbedPane tabbedPane, String title, JPanel content, Font tabFont) {
+        int tabWidth = 220; // Custom tab width
+        JPanel tabPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0)); // Centered
+        tabPanel.setPreferredSize(new Dimension(tabWidth, 30)); 
+        tabPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); 
+        tabPanel.setBackground(new Color(239, 239, 239)); // Light gray
+
+        JLabel tabLabel = new JLabel(title); 
+        tabLabel.setFont(tabFont); 
+        tabLabel.setHorizontalAlignment(SwingConstants.CENTER); 
+        
+        tabPanel.add(tabLabel); 
+        tabbedPane.addTab("", content); 
+        tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, tabPanel); 
     }
 
     public static void main(String[] args) {

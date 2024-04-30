@@ -2,6 +2,7 @@ package com.jdbc.model;
 
 public class Course {
     
+    // Variables representing course data
     private int courseId;
     private String courseName;
     private String courseCategory;
@@ -11,6 +12,7 @@ public class Course {
     private String courseDuration;
     
     
+    // Constructor with all course attributes
     public Course(int courseId, String courseName, String courseCategory, int courseCredits, 
                   String courseLevel, String courseDelivery, String courseDuration) {
         this.courseId = courseId;
@@ -22,6 +24,7 @@ public class Course {
         this.courseDuration = courseDuration;
     }
 
+    // Constructor for creating a course without an ID (for new courses)
     public Course(String courseName, String courseCategory, int courseCredits, 
                   String courseLevel, String courseDelivery, String courseDuration) {
         this.courseName = courseName;
@@ -32,6 +35,7 @@ public class Course {
         this.courseDuration = courseDuration;
     }
     
+    // Getters and Setters for the course attributes
     public int getCourseId() {
         return courseId;
     }

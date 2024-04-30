@@ -6,98 +6,88 @@ import java.awt.*;
 import java.util.List;
 import com.jdbc.model.Course;
 import com.jdbc.service.DatabaseService;
+import java.sql.SQLException;
 
 public class ViewCoursePanel extends JPanel {
     public ViewCoursePanel(DatabaseService databaseService) {
         setLayout(new BorderLayout());
 
-        JPanel titlePanel = createTitlePanel();
-        add(titlePanel, BorderLayout.NORTH);
-
-        DefaultTableModel tableModel = createTableModel();
-        JTable courseTable = createCourseTable(tableModel);
-
-        JScrollPane scrollPane = new JScrollPane(courseTable);
-        add(scrollPane, BorderLayout.CENTER);
-
-        populateTable(tableModel, databaseService);
-    }
-
-    private JPanel createTitlePanel() {
+        // Title section
         JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
-        titlePanel.setBackground(new Color(211, 211, 211));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0)); // Padding
+        titlePanel.setBackground(new Color(211, 211, 211)); // Light grey
+        
+        JLabel titleLabel = new JLabel("View Courses", SwingConstants.CENTER); // Centered title
+        titleLabel.setFont(new Font("Helvetica", Font.BOLD, 22)); // Font and size
+        titlePanel.add(titleLabel, BorderLayout.CENTER); // Add the title to the panel
+        
+        add(titlePanel, BorderLayout.NORTH); // Add to the north section
 
-        JLabel titleLabel = new JLabel("View Courses", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Helvetica", Font.BOLD, 22));
-        titlePanel.add(titleLabel, BorderLayout.CENTER);
-
-        return titlePanel;
-    }
-
-    private DefaultTableModel createTableModel() {
+        // Table setup
         String[] columnNames = {"Code", "Name", "Category", "Credits", "Level", "Delivery", "Duration"};
-        return new DefaultTableModel(columnNames, 0);
-    }
-
-    private JTable createCourseTable(DefaultTableModel tableModel) {
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable courseTable = new JTable(tableModel);
-        customizeTable(courseTable);
-        customizeColumnWidths(courseTable);
-        return courseTable;
-    }
 
-    private void customizeTable(JTable courseTable) {
+        // Set custom font and style for the table header
         JTableHeader tableHeader = courseTable.getTableHeader();
-        tableHeader.setFont(new Font("Helvetica", Font.BOLD, 14));
-        courseTable.setFont(new Font("Helvetica", Font.PLAIN, 13));
-        courseTable.setRowHeight(25);
-        courseTable.setDefaultRenderer(Object.class, createCustomRenderer());
-    }
+        tableHeader.setFont(new Font("Helvetica", Font.BOLD, 14)); // Header font
 
-    private DefaultTableCellRenderer createCustomRenderer() {
-        return new DefaultTableCellRenderer() {
+        courseTable.setFont(new Font("Helvetica", Font.PLAIN, 13)); // Content font
+        courseTable.setRowHeight(25); // Set row height
+
+        // Custom cell renderer for alternating row colors
+        DefaultTableCellRenderer customRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(
                 JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column
             ) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (!isSelected) {
-                    if (row % 2 == 0) {
+                if (!isSelected) { // Change the color if the row is not selected
+                    if (row % 2 == 0) { // Even rows with light blue
                         c.setBackground(new Color(245, 250, 255));
-                    } else {
+                    } else { // Odd rows with white
                         c.setBackground(Color.WHITE);
                     }
                 }
-                ((JLabel) c).setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+                ((JLabel) c).setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0)); // 10px left padding
                 return c;
             }
         };
-    }
 
-    private void customizeColumnWidths(JTable courseTable) {
-        TableColumnModel columnModel = courseTable.getColumnModel();
-        columnModel.getColumn(0).setPreferredWidth(50);
-        columnModel.getColumn(0).setMinWidth(30);
-        columnModel.getColumn(0).setMaxWidth(70);
-        columnModel.getColumn(1).setPreferredWidth(240);
-        columnModel.getColumn(1).setMinWidth(200);
-        columnModel.getColumn(1).setMaxWidth(270);
-    }
+        courseTable.setDefaultRenderer(Object.class, customRenderer); // Apply custom renderer
+        
+        // Set the preferred, minimum, and maximum width for the first column
+        TableColumn codeColumn = courseTable.getColumnModel().getColumn(0);
+        codeColumn.setPreferredWidth(50); // Preferred width for "Code"
+        codeColumn.setMinWidth(30); // Minimum width
+        codeColumn.setMaxWidth(70); // Maximum width
 
-    private void populateTable(DefaultTableModel tableModel, DatabaseService databaseService) {
-        List<Course> courses = databaseService.getAllCourse();
-        for (Course course : courses) {
-            Object[] row = {
-                course.getCourseId(),
-                course.getCourseName(),
-                course.getCourseCategory(),
-                course.getCourseCredits(),
-                course.getCourseLevel(),
-                course.getCourseDelivery(),
-                course.getCourseDuration()
-            };
-            tableModel.addRow(row);
+        // Adjust the "Name" column
+        TableColumn nameColumn = courseTable.getColumnModel().getColumn(1);
+        nameColumn.setPreferredWidth(240); // Preferred width for "Name"
+        nameColumn.setMinWidth(200); // Minimum width
+        nameColumn.setMaxWidth(270); // Maximum width
+        
+        JScrollPane scrollPane = new JScrollPane(courseTable); // Enable scrolling
+        add(scrollPane, BorderLayout.CENTER); // Add to the center
+        
+        // Fetch data and populate the table
+        try {
+            List<Course> courses = databaseService.getAllCourse();
+            for (Course course : courses) {
+                Object[] row = {
+                    course.getCourseId(),
+                    course.getCourseName(),
+                    course.getCourseCategory(),
+                    course.getCourseCredits(),
+                    course.getCourseLevel(),
+                    course.getCourseDelivery(),
+                    course.getCourseDuration()
+                };
+                tableModel.addRow(row); // Add the row to the table model
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
